@@ -9,10 +9,12 @@
 // Required for most of open.mp.
 #include <sdk.hpp>
 
+#include "Server/Components/Console/console.hpp"
+
 // This should use an abstract interface if it is to be passed to other components.  Like the files
 // in `<Server/Components/>` you would share only this base class and keep the implementation
 // private.
-class EmptyTemplate final : public IComponent
+class EmptyTemplate final : public IComponent, ConsoleEventHandler
 {
 private:
 	// Hold a reference to the main server core.
@@ -20,7 +22,7 @@ private:
 
 public:
 	// Visit https://open.mp/uid to generate a new unique ID.
-	PROVIDE_UID(/* UID GOES HERE */);
+	PROVIDE_UID(0xA65F81D085FB652F);
 
 	// When this component is destroyed we need to tell any linked components this it is gone.
 	~EmptyTemplate()
@@ -47,6 +49,12 @@ public:
 
 	void onInit(IComponentList* components) override
 	{
+		components->queryComponent<IConsoleComponent>()->getEventDispatcher().addEventHandler(this);
+	}
+
+	void onConsoleCommandListRequest(FlatHashSet<StringView>& commands)
+	{
+	    commands.emplace("foobar");
 	}
 
 	void onReady() override
